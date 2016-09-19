@@ -1,0 +1,19 @@
+; {{ ansible_managed }}
+
+[uwsgi]
+
+; mapped uwsgi settings
+{% for key, value in uwsgi.iteritems() %}
+{{ key }} = {{ value }}
+{% endfor %}
+
+; configuration settings
+home = {{ virtualenv_dir }}
+pythonpath = {{ source_dir }}
+chdir = {{ source_dir }}
+{% if app_user != 'www-data' %}username = {{ app_user }}{% endif %}
+
+; env vars
+{% for var in env_vars %}
+env = {{ var }}
+{% endfor %}

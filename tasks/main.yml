@@ -1,0 +1,109 @@
+---
+
+- name: updating apt cache
+  apt:
+    update_cache: yes
+
+- name: installing pip
+  apt:
+    name: python3-pip
+    state: latest
+  when: python_version >= 3
+
+- name: installing pip
+  apt:
+    name: python-pip
+    state: latest
+  when: python_version < 3
+
+- name: pip installing virtualenv
+  pip:
+    name: virtualenv
+    state: latest
+    executable: pip3
+  when: python_version >= 3
+
+- name: pip installing virtualenv
+  pip:
+    name: virtualenv
+    state: latest
+  when: python_version < 3
+
+- name: installing system packages
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items: system_packages
+
+- name: creating /www directory
+  file:
+    path: /www/
+    state: directory
+    mode: 750
+    owner: www-data
+    group: www-data
+
+- name: creating the {{ app_user }} user
+  user:
+    name: "{{ app_user }}"
+    shell: /bin/bash
+    createhome: yes
+    group: www-data
+
+- name: creating app source directory
+  file:
+    path: "{{ source_dir }}"
+    state: directory
+    mode: 770
+    owner: "{{ app_user }}"
+    group: www-data
+
+- name: creating virtualenv directory
+  file:
+    path: "{{ virtualenv_dir }}"
+    state: directory
+    mode: 750
+    owner: "{{ app_user }}"
+    group: www-data
+
+- name: creating virtualenv
+  command: virtualenv -p python3 {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
+  become: yes
+  become_user: "{{ app_user }}"
+  when: python_version >= 3
+
+- name: creating virtualenv
+  command: virtualenv {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
+  become: yes
+  become_user: "{{ app_user }}"
+  when: python_version < 3
+
+- name: pip installing python packages
+  pip:
+    name: "{{ item }}"
+    state: present
+    virtualenv: "{{ virtualenv_dir }}"
+    chdir: "{{ source_dir }}"
+  with_items: python_packages
+  when: python_packages is defined
+
+- name: pip installing requirements
+  pip:
+    requirements: "{{ requirements_file }}"
+    virtualenv: "{{ virtualenv_dir }}"
+    chdir: "{{ source_dir }}"
+  when: requirements_file is defined
+
+- name: creating vassal ini file
+  template:
+    src: vassal.ini.j2
+    dest: /etc/uwsgi-emperor/vassals/{{ app_name }}.ini
+    owner: "{{ app_user }}"
+    group: www-data
+  when: app_enabled
+  notify: restart uwsgi
+
+- name: making sure uwsgi is running
+  service:
+    name: uwsgi-emperor
+    state: started

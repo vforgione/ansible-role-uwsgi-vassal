@@ -1,0 +1,19 @@
+python_version: 3.5
+
+system_packages: []
+
+app_user: www-data
+
+source_dir: "/www/{{ app_name }}"
+
+virtualenv_dir: "/var/venvs/{{ app_name }}"
+
+python_packages: []
+
+requirements_file: null
+
+app_enabled: no
+
+env_vars: []
+
+uwsgi: {}
