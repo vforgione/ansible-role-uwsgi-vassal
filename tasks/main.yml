@@ -35,20 +35,20 @@
     state: present
   with_items: "{{ system_packages }}"
 
-- name: creating /www directory
-  file:
-    path: /www/
-    state: directory
-    mode: 750
-    owner: www-data
-    group: www-data
-
 - name: creating the {{ app_user }} user
   user:
     name: "{{ app_user }}"
     shell: /bin/bash
     createhome: yes
-    group: www-data
+    group: "{{ app_group }}"
+
+- name: creating {{ apps_dir }} directory
+  file:
+    path: "{{ apps_dir }}"
+    state: directory
+    mode: 750
+    owner: "{{ app_user }}"
+    group: "{{ app_group }}"
 
 - name: creating app source directory
   file:

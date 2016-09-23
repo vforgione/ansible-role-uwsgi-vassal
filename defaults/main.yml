@@ -4,9 +4,15 @@ system_packages: []
 
 app_user: www-data
 
-source_dir: "/www/{{ app_name }}"
+app_group: www-data
 
-virtualenv_dir: "/var/venvs/{{ app_name }}"
+apps_dir: /www
+
+source_dir: "{{ apps_dir }}/{{ app_name }}"
+
+venvs_dir: /var/venvs
+
+virtualenv_dir: "{{ venvs_dir }}/{{ app_name }}"
 
 python_packages: []
 
