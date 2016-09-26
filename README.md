@@ -3,13 +3,17 @@
 Creates an app user, applications directory, virtualenv for an application meant to be run as
 a vassal to a uWSGI process in emperor mode.
 
+This role only works with Ubuntu, and it has only been tested on 14.04 and 16.04.
+
 ## Usage
 
 ### Variables
 
+#### Required
+
 There is one required variable that needs to be defined in your playbook: `app_name`.
 
-There are a number of other configurable variables:
+#### Configurable
 
 | name              | default                | description                                          |
 | ----------------- | ---------------------- | ---------------------------------------------------- |
@@ -27,7 +31,9 @@ There are a number of other configurable variables:
 | env_vars          | []                     | environment vars to be written to the vassal ini     |
 | uwsgi             | {}                     | additional key/value pairs to be added to vassal ini |
 
-### Minimum Playbook
+### Playbook Examples
+
+#### Minimal
 
 ```yaml
 - hosts: all
@@ -41,3 +47,111 @@ There are a number of other configurable variables:
 
 This will create a virtualenv at `/var/venvs/metalsnake` and an application dir at `/www/metalsnake`
 both owned by `www-data:www-data`.
+
+It will also create `/etc/uwsgi-emperor/vassals/metalsnake.ini` vassal config file:
+
+```ini
+[uwsgi]
+home = /var/venvs/metalsnake
+pythonpath = /www/metalsnake
+chdir = /www/metalsnake
+```
+
+#### Configured - Flask App
+
+```yaml
+- hosts: all
+  become: yes
+  become_user: root
+  roles:
+    - role: uwsgi-vassal
+      app_name: metalsnake
+      app_enabled: yes
+      requirements_file: /www/metalsnake/requirements.txt
+      system_packages:
+        - libpq-dev
+        - libssl-dev
+      uwsgi:
+        wsgi-file: app.py
+        callable: app
+        socket: 127.0.0.1:5000
+        workers: 1
+        buffer-size: 16384
+```
+
+This will create a virtualenv at `/var/venvs/metalsnake` and an application dir at `/www/metalsnake`
+both owned by `www-data:www-data`.
+
+It will also create `/etc/uwsgi-emperor/vassals/metalsnake.ini` vassal config file:
+
+```ini
+[uwsgi]
+wsgi-file = app.py
+callable = app
+socket: 127.0.0.1:5000
+buffer-size = 16384
+home = /var/venvs/metalsnake
+pythonpath = /www/metalsnake
+chdir = /www/metalsnake
+```
+
+#### Configured - Django App
+
+```yaml
+- hosts: all
+  become: yes
+  become_user: root
+  roles:
+    - role: uwsgi-vassal
+      app_name: metalsnake
+      app_enabled: yes
+      requirements_file: /www/metalsnake/requirements.txt
+      system_packages:
+        - libpq-dev
+        - libssl-dev
+      uwsgi:
+        module: metalsnake.wsgi:application
+        socket: 127.0.0.1:8000
+        workers: 1
+        buffer-size: 16384
+      env_vars:
+        - "DJANGO_SETTINGS_MODULE=metalsnake.settings.vagrant"
+        - "PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
+```
+
+This will create a virtualenv at `/var/venvs/metalsnake` and an application dir at `/www/metalsnake`
+both owned by `www-data:www-data`.
+
+It will also create `/etc/uwsgi-emperor/vassals/metalsnake.ini` vassal config file:
+
+```ini
+[uwsgi]
+module = metalsnake.wsgi:application
+socket = 127.0.0.1:8000
+buffer-size = 16384
+home = /var/venvs/metalsnake
+pythonpath = /www/metalsnake
+chdir = /www/metalsnake
+env = DJANGO_SETTINGS_MODULE=metalsnake.settings.vagrant
+env = PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
