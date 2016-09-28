@@ -114,6 +114,8 @@ chdir = /www/metalsnake
         socket: 127.0.0.1:8000
         workers: 1
         buffer-size: 16384
+        pythonpath: /www/metalsnake/metalsnake
+        chdir: /www/metalsnake/metalsnake
       env_vars:
         - "DJANGO_SETTINGS_MODULE=metalsnake.settings.vagrant"
         - "PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
@@ -130,8 +132,8 @@ module = metalsnake.wsgi:application
 socket = 127.0.0.1:8000
 buffer-size = 16384
 home = /var/venvs/metalsnake
-pythonpath = /www/metalsnake
-chdir = /www/metalsnake
+pythonpath = /www/metalsnake/metalsnake
+chdir = /www/metalsnake/metalsnake
 env = DJANGO_SETTINGS_MODULE=metalsnake.settings.vagrant
 env = PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
 ```

@@ -6,11 +6,10 @@
 {% for key, value in uwsgi.iteritems() %}
 {{ key }} = {{ value }}
 {% endfor %}
+{% if 'pythonpath' not in uwsgi.keys() %}pythonpath = {{ source_dir }}{% endif %}
+{% if 'chdir' not in uwsgi.keys() %}chdir = {{ source_dir }}{% endif %}
 
-; configuration settings
-home = {{ virtualenv_dir }}
-pythonpath = {{ source_dir }}
-chdir = {{ source_dir }}
+; user settings
 {% if app_user != 'www-data' %}username = {{ app_user }}{% endif %}
 
 ; env vars
