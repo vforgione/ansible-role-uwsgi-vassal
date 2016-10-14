@@ -58,16 +58,16 @@
     owner: "{{ app_user }}"
     group: www-data
 
-- name: adding ssh key
+- name: adding ssh private key
   copy:
     src: ~/.ssh/id_rsa
-    dest: /root/.ssh/id_rsa
+    dest: /root/.ssh/id_rsa_{{ gh_repo }}.pub
   when: gh_repo is defined
 
-- name: adding ssh key
+- name: adding ssh public key
   copy:
     src: ~/.ssh/id_rsa.pub
-    dest: /root/.ssh/id_rsa.pub
+    dest: /root/.ssh/id_rsa_{{ gh_repo }}.pub
   when: gh_repo is defined
 
 - name: cloning project into {{ source_dir }}
@@ -77,12 +77,18 @@
     dest: "{{ source_dir }}"
     accept_hostkey: yes
     force: yes
-    key_file: /root/.ssh/id_rsa
+    key_file: /root/.ssh/id_rsa_{{ gh_repo }}
   when: gh_repo is defined
 
-- name: adding ssh key
+- name: removing ssh private key
   file:
-    path: /root/.ssh
+    path: /root/.ssh/id_rsa_{{ gh_repo }}
+    state: absent
+  when: gh_repo is defined
+
+- name: removing ssh public key
+  file:
+    path: /root/.ssh/id_rsa_{{ gh_repo }}.pub
     state: absent
   when: gh_repo is defined
 
