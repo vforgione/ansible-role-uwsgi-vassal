@@ -65,7 +65,7 @@
     dest: "{{ source_dir }}"
     accept_hostkey: yes
     force: yes
-    key_file: "{{ gh_id_rsa }}"
+#    key_file: "{{ gh_id_rsa }}"
   when: gh_repo is defined and gh_id_rsa is defined
 
 - name: chowning repo
