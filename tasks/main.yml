@@ -58,6 +58,14 @@
     owner: "{{ app_user }}"
     group: www-data
 
+- name: cloning project into {{ source_dir }}
+  git:
+    clone: yes
+    repo: "https://{{ gh_user }}:{{ gh_password }}@github.com/{{ gh_repo }}"
+    dest: "{{ source_dir }}"
+  when: gh_repo is defined and gh_user is defined and gh_passwd is defined
+
+
 - name: creating virtualenv directory
   file:
     path: "{{ virtualenv_dir }}"

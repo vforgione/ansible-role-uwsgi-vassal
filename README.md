@@ -30,6 +30,9 @@ There is one required variable that needs to be defined in your playbook: `app_n
 | app_enabled       | no                     | should a vassal ini file be added to the emperor     |
 | env_vars          | []                     | environment vars to be written to the vassal ini     |
 | uwsgi             | {}                     | additional key/value pairs to be added to vassal ini |
+| gh_repo           | undefined              | a GitHub path to a repo; a la `username/repo.git`    |
+| gh_user           | undefined              | a GitHub username to clone the repo                  |
+| gh_passwd         | undefined              | the password for the user to clone the repo          |
 
 ### Playbook Examples
 
@@ -138,6 +141,44 @@ env = DJANGO_SETTINGS_MODULE=metalsnake.settings.vagrant
 env = PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
 ```
 
+
+## Cloning a Private Repo
+
+```yaml
+- hosts: all
+
+  become: yes
+  become_user: root
+
+  vars_prompt:
+    - name: gh_user
+      prompt: "Enter your GitHub username: "
+      private: no
+
+    - name: gh_passwd
+      prompt: "Enter the password for your username: "
+      private: yes
+
+  roles:
+    - role: uwsgi-vassal
+      app_name: metalsnake
+      app_enabled: yes
+      gh_repo: metalapps/metalsnake.git
+      requirements_file: /www/metalsnake/requirements.txt
+      system_packages:
+        - libpq-dev
+        - libssl-dev
+      uwsgi:
+        module: metalsnake.wsgi:application
+        socket: 127.0.0.1:8000
+        workers: 1
+        buffer-size: 16384
+        pythonpath: /www/metalsnake/metalsnake
+        chdir: /www/metalsnake/metalsnake
+      env_vars:
+        - "DJANGO_SETTINGS_MODULE=metalsnake.settings.vagrant"
+        - "PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games"
+```
 
 
 
