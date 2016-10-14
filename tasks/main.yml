@@ -77,21 +77,29 @@
   file:
     path: "{{ virtualenv_dir }}"
     state: directory
-    mode: 750
+    mode: 770
     owner: "{{ app_user }}"
     group: www-data
 
 - name: creating virtualenv
   command: virtualenv -p python3 {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
-  become: yes
-  become_user: "{{ app_user }}"
+#  become: yes
+#  become_user: "{{ app_user }}"
   when: python_version >= 3
 
 - name: creating virtualenv
   command: virtualenv {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
-  become: yes
-  become_user: "{{ app_user }}"
+#  become: yes
+#  become_user: "{{ app_user }}"
   when: python_version < 3
+
+- name: chowning virtualenv
+  file:
+    path: "{{ virtualenv_dir }}"
+    state: directory
+    mode: 770
+    owner: "{{ app_user }}"
+    group: www-data
 
 - name: pip installing python packages
   pip:
