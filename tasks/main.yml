@@ -46,7 +46,7 @@
   file:
     path: "{{ apps_dir }}"
     state: directory
-    mode: 750
+    mode: 770
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
 
@@ -65,6 +65,13 @@
     dest: "{{ source_dir }}"
   when: gh_repo is defined and gh_user is defined and gh_passwd is defined
 
+- name: chowning repo
+  file:
+    path: "{{ source_dir }}"
+    state: directory
+    mode: 770
+    owner: "{{ app_user }}"
+    group: www-data
 
 - name: creating virtualenv directory
   file:
