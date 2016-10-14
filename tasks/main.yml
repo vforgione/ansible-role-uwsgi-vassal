@@ -61,7 +61,7 @@
 - name: cloning project into {{ source_dir }}
   git:
     clone: yes
-    repo: "git@github.com/{{ gh_repo }}"
+    repo: "git@github.com:{{ gh_repo }}"
     dest: "{{ source_dir }}"
     accept_hostkey: yes
     force: yes
