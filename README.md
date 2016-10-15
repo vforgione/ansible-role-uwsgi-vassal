@@ -31,8 +31,7 @@ There is one required variable that needs to be defined in your playbook: `app_n
 | env_vars          | []                     | environment vars to be written to the vassal ini     |
 | uwsgi             | {}                     | additional key/value pairs to be added to vassal ini |
 | gh_repo           | undefined              | a GitHub path to a repo; a la `username/repo.git`    |
-| gh_user           | undefined              | a GitHub username to clone the repo                  |
-| gh_passwd         | undefined              | the password for the user to clone the repo          |
+| gh_key            | undefined              | path the the private key to clone repos from GitHub  |
 
 ### Playbook Examples
 
