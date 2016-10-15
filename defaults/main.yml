@@ -1,7 +1,5 @@
 python_version: 3.5
 
-system_packages: []
-
 app_user: www-data
 
 app_group: www-data
@@ -13,10 +11,6 @@ source_dir: "{{ apps_dir }}/{{ app_name }}"
 venvs_dir: /var/venvs
 
 virtualenv_dir: "{{ venvs_dir }}/{{ app_name }}"
-
-python_packages: []
-
-requirements_file: null
 
 app_enabled: no
 

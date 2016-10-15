@@ -1,39 +1,43 @@
 ---
 
-- name: updating apt cache
-  apt:
-    update_cache: yes
+# install pip and virtualenv
 
-- name: installing pip
-  apt:
-    name: python3-pip
-    state: latest
+- include: python3
   when: python_version >= 3
 
 - name: installing pip
   apt:
     name: python-pip
     state: latest
-  when: python_version < 3
+    update_cache: yes
 
-- name: pip installing virtualenv
+- name: installing virtualenv
+  pip:
+    name: virtualenv
+    state: latest
+
+- name: installing pip
+  apt:
+    name: python3-pip
+    state: latest
+    update_cache: yes
+
+- name: installing virtualenv
   pip:
     name: virtualenv
     state: latest
     executable: pip3
-  when: python_version >= 3
 
-- name: pip installing virtualenv
-  pip:
-    name: virtualenv
-    state: latest
-  when: python_version < 3
+# system packages
 
 - name: installing system packages
   apt:
     name: "{{ item }}"
     state: present
   with_items: "{{ system_packages }}"
+  when: system_packages is defined
+
+# app user
 
 - name: creating the {{ app_user }} user
   user:
@@ -42,11 +46,13 @@
     createhome: yes
     group: "{{ app_group }}"
 
+# app dirs
+
 - name: creating {{ apps_dir }} directory
   file:
     path: "{{ apps_dir }}"
     state: directory
-    mode: 770
+    mode: 0755
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
 
@@ -54,46 +60,56 @@
   file:
     path: "{{ source_dir }}"
     state: directory
-    mode: 770
+    mode: 0755
     owner: "{{ app_user }}"
     group: www-data
+
+# clone project
+
+- name: copying private key to ~/.ssh/id_rsa_{{ app_name }}
+  copy:
+    src: "{{ lookup('file', gh_key) }}"
+    dest: "~/.ssh/id_rsa_{{ app_name }}"
+    mode: 0400
 
 - name: cloning project into {{ source_dir }}
   git:
-    clone: yes
     repo: "git@github.com:{{ gh_repo }}"
     dest: "{{ source_dir }}"
     accept_hostkey: yes
-    force: yes
-    key_file: /root/.ssh/id_rsa_{{ app_name }}
-  when: gh_repo is defined
+    key_file: "~/.ssh/id_rsa_{{ app_name }}"
 
-- name: chowning repo
+- name: destroying private key
+  file:
+    path: "~/.ssh/id_rsa_{{ app_name }}"
+    state: absent
+
+# chown app code
+
+- name: chowning app code
   file:
     path: "{{ source_dir }}"
     state: directory
-    mode: 770
+    mode: 0755
     owner: "{{ app_user }}"
     group: www-data
+
+# setup virtualenv
 
 - name: creating virtualenv directory
   file:
     path: "{{ virtualenv_dir }}"
     state: directory
-    mode: 770
+    mode: 0755
     owner: "{{ app_user }}"
     group: www-data
 
 - name: creating virtualenv
   command: virtualenv -p python3 {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
-#  become: yes
-#  become_user: "{{ app_user }}"
   when: python_version >= 3
 
 - name: creating virtualenv
   command: virtualenv {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
-#  become: yes
-#  become_user: "{{ app_user }}"
   when: python_version < 3
 
 - name: chowning virtualenv
@@ -103,6 +119,8 @@
     mode: 770
     owner: "{{ app_user }}"
     group: www-data
+
+# pip install stuff
 
 - name: pip installing python packages
   pip:
@@ -120,6 +138,8 @@
     chdir: "{{ source_dir }}"
   when: requirements_file is defined
 
+# vassal ini
+
 - name: creating vassal ini file
   template:
     src: vassal.ini.j2
@@ -132,4 +152,4 @@
 - name: making sure uwsgi is running
   service:
     name: uwsgi-emperor
-    state: started
+    state: restarted
