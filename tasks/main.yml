@@ -67,9 +67,14 @@
 
 # clone project
 
+- name: installing git
+  apt:
+    name: git
+    state: present
+
 - name: copying private key to ~/.ssh/id_rsa_{{ app_name }}
   copy:
-    src: "{{ lookup('file', gh_key) }}"
+    src: "{{ gh_key }}"
     dest: "~/.ssh/id_rsa_{{ app_name }}"
     mode: 0400
 
@@ -79,6 +84,7 @@
     dest: "{{ source_dir }}"
     accept_hostkey: yes
     key_file: "~/.ssh/id_rsa_{{ app_name }}"
+    update: yes
 
 - name: destroying private key
   file:
@@ -92,6 +98,7 @@
     path: "{{ source_dir }}"
     state: directory
     mode: 0755
+    recurse: yes
     owner: "{{ app_user }}"
     group: www-data
 
@@ -117,7 +124,8 @@
   file:
     path: "{{ virtualenv_dir }}"
     state: directory
-    mode: 770
+    mode: 0755
+    recurse: yes
     owner: "{{ app_user }}"
     group: www-data
 
