@@ -71,6 +71,7 @@
   apt:
     name: git
     state: present
+  when: gh_repo is defined and gh_key is defined
 
 - name: copying private key to ~/.ssh/id_rsa_{{ app_name }}
   copy:
