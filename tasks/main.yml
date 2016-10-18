@@ -133,6 +133,13 @@
   when: app_enabled
   notify: restart uwsgi
 
+- name: creating {{ app_name }} socket for nginx/uwsgi
+  file:
+    path: "/tmp/{{ app_name }}.sock"
+    state: present
+    owner: "{{ app_user }}"
+    group: www-data
+
 - name: making sure uwsgi is running
   service:
     name: uwsgi-emperor
