@@ -77,6 +77,7 @@
     src: "{{ gh_key }}"
     dest: "~/.ssh/id_rsa_{{ app_name }}"
     mode: 0400
+  when: gh_repo is defined and gh_key is defined
 
 - name: cloning project into {{ source_dir }}
   git:
@@ -85,11 +86,13 @@
     accept_hostkey: yes
     key_file: "~/.ssh/id_rsa_{{ app_name }}"
     update: yes
+  when: gh_repo is defined and gh_key is defined
 
 - name: destroying private key
   file:
     path: "~/.ssh/id_rsa_{{ app_name }}"
     state: absent
+  when: gh_repo is defined and gh_key is defined
 
 # chown app code
 
