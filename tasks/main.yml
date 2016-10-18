@@ -117,7 +117,7 @@
     group: www-data
 
 - name: creating virtualenv
-  command: virtualenv -p python3 {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
+  command: virtualenv -p python{{ python_version }} {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
   when: python_version >= 3
 
 - name: creating virtualenv
