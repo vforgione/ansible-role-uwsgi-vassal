@@ -136,7 +136,7 @@
 - name: creating {{ app_name }} socket for nginx/uwsgi
   file:
     path: "/tmp/{{ app_name }}.sock"
-    state: present
+    state: touch
     owner: "{{ app_user }}"
     group: www-data
 
