@@ -1,41 +1,45 @@
 # uWSGI Vassal
 
-Creates an app user, applications directory, virtualenv for an application meant to be run as
-a vassal to a uWSGI process in emperor mode.
+A role for installing a Python application as a uWSGI vassal
 
-This role only works with Ubuntu, and it has only been tested on 14.04 and 16.04.
 
-## Usage
+## Requirements
 
-### Variables
+This role requires that a specified version of Python is installed on the target host machines. See [Role Variables](#role-variables) for more information.
 
-#### Required
+It also makes sense to have uWSGI installed and running in emperor mode.
 
-There is one required variable that needs to be defined in your playbook: `app_name`.
 
-#### Configurable
+## Dependencies
 
-| name              | default                | description                                          |
-| ----------------- | ---------------------- | ---------------------------------------------------- |
-| python_version    | 3.5                    | python version                                       |
-| system_packages   | undefined              | a list of apt installable package names              |
-| app_user          | www-data               | the name of the user to create                       |
-| app_group         | www-data               | the user's group                                     |
-| apps_dir          | /www                   | the base path for all the vassal applications        |
-| source_dir        | {apps_dir}/{app_name}  | where the application code will live                 |
-| venvs_dir         | /var/venvs             | the base path to application virtualenvs             |
-| virtualenv_dir    | {venvs_dir}/{app_name} | where the application's virtualenv will libe         |
-| python_packages   | undefined              | a list of pip installable package names              |
-| requirements_file | undefined              | the path to the application requirements.txt file    |
-| app_enabled       | no                     | should a vassal ini file be added to the emperor     |
-| env_vars          | []                     | environment vars to be written to the vassal ini     |
-| uwsgi             | {}                     | additional key/value pairs to be added to vassal ini |
-| gh_repo           | undefined              | a GitHub path to a repo; a la `username/repo.git`    |
-| gh_key            | undefined              | path the the private key to clone repos from GitHub  |
+- vforgione.python
+- vforgione.uwsgi-emperor
 
-### Playbook Examples
 
-#### Minimal
+## Role Variables
+
+| name                | default                | description                                          |
+| ------------------- | ---------------------- | ---------------------------------------------------- |
+| `python_version`    | 3.5                    | python version                                       |
+| `system_packages`   | undefined              | a list of apt installable package names              |
+| `app_user`          | www-data               | the name of the user to create                       |
+| `app_group`         | www-data               | the user's group                                     |
+| `apps_dir`          | /www                   | the base path for all the vassal applications        |
+| `source_dir`        | {apps_dir}/{app_name}  | where the application code will live                 |
+| `venvs_dir`         | /var/venvs             | the base path to application virtualenvs             |
+| `virtualenv_dir`    | {venvs_dir}/{app_name} | where the application's virtualenv will libe         |
+| `python_packages`   | undefined              | a list of pip installable package names              |
+| `requirements_file` | undefined              | the path to the application requirements.txt file    |
+| `app_enabled`       | no                     | should a vassal ini file be added to the emperor     |
+| `env_vars`          | []                     | environment vars to be written to the vassal ini     |
+| `uwsgi`             | {}                     | additional key/value pairs to be added to vassal ini |
+| `gh_repo`           | undefined              | a GitHub path to a repo; a la `username/repo.git`    |
+| `gh_key`            | undefined              | path the the private key to clone repos from GitHub  |
+
+
+## Example Playbooks
+
+### Minimal
 
 ```yaml
 - hosts: all
@@ -59,7 +63,7 @@ pythonpath = /www/metalsnake
 chdir = /www/metalsnake
 ```
 
-#### Configured - Flask App
+### Configured - Flask App
 
 ```yaml
 - hosts: all
@@ -97,7 +101,7 @@ pythonpath = /www/metalsnake
 chdir = /www/metalsnake
 ```
 
-#### Configured - Django App
+### Configured - Django App
 
 ```yaml
 - hosts: all
@@ -141,7 +145,7 @@ env = PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
 ```
 
 
-## Cloning a Private Repo
+### Cloning a Private Repo
 
 ```yaml
 - hosts: all
@@ -176,20 +180,11 @@ env = PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
 ```
 
 
+## License
+
+MIT
 
 
+## Author Information
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+[Vince Forgione](https://github.com/vforgione)

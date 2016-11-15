@@ -89,11 +89,6 @@
 
 - name: creating virtualenv
   command: virtualenv -p python{{ python_version }} {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
-  when: python_version >= 3
-
-- name: creating virtualenv
-  command: virtualenv {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
-  when: python_version < 3
 
 - name: chowning virtualenv
   file:
