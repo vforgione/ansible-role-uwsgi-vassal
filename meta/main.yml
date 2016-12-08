@@ -1,9 +1,5 @@
 ---
 
-dependencies:
-  - vforgione.python
-  - vforgione.uwsgi-emperor
-
 galaxy_info:
   author: Vince Forgione
   description: A role for installing a Python application as a uWSGI vassal
