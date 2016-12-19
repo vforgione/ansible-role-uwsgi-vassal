@@ -19,3 +19,5 @@ app_enabled: no
 env_vars: []
 
 uwsgi: {}
+
+system_packages: []
