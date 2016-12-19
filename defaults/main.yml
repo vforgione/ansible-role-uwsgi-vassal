@@ -21,3 +21,5 @@ env_vars: []
 uwsgi: {}
 
 system_packages: []
+
+python_packages: []
