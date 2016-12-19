@@ -3,7 +3,7 @@
 [uwsgi]
 
 ; mapped uwsgi settings
-{% for key, value in uwsgi.iteritems() %}
+{% for key, value in uwsgi.items() %}
 {{ key }} = {{ value }}
 {% endfor %}
 {% if 'pythonpath' not in uwsgi.keys() %}pythonpath = {{ source_dir }}{% endif %}
