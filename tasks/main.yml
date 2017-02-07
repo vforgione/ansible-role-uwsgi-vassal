@@ -8,6 +8,7 @@
     state: present
   with_items: "{{ system_packages }}"
   when: system_packages is defined
+  become: yes
 
 # app user
 
@@ -17,6 +18,7 @@
     shell: /bin/bash
     createhome: yes
     group: "{{ app_group }}"
+  become: yes
 
 # app dirs
 
@@ -35,6 +37,7 @@
     mode: 0755
     owner: "{{ app_user }}"
     group: www-data
+  become: yes
 
 # clone project
 
@@ -42,40 +45,16 @@
   apt:
     name: git
     state: present
-  when: gh_repo is defined and gh_key is defined
-
-- name: copying private key to ~/.ssh/id_rsa_{{ app_name }}
-  copy:
-    src: "{{ gh_key }}"
-    dest: "~/.ssh/id_rsa_{{ app_name }}"
-    mode: 0400
-  when: gh_repo is defined and gh_key is defined
+  when: gh_repo is defined
+  become: yes
 
 - name: cloning project into {{ source_dir }}
   git:
     repo: "git@github.com:{{ gh_repo }}"
     dest: "{{ source_dir }}"
     accept_hostkey: yes
-    key_file: "~/.ssh/id_rsa_{{ app_name }}"
     update: yes
-  when: gh_repo is defined and gh_key is defined
-
-- name: destroying private key
-  file:
-    path: "~/.ssh/id_rsa_{{ app_name }}"
-    state: absent
-  when: gh_repo is defined and gh_key is defined
-
-# chown app code
-
-- name: chowning app code
-  file:
-    path: "{{ source_dir }}"
-    state: directory
-    mode: 0755
-    recurse: yes
-    owner: "{{ app_user }}"
-    group: www-data
+  when: gh_repo is defined
 
 # setup virtualenv
 
@@ -89,15 +68,6 @@
 
 - name: creating virtualenv
   command: virtualenv -p python{{ python_version }} {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
-
-- name: chowning virtualenv
-  file:
-    path: "{{ virtualenv_dir }}"
-    state: directory
-    mode: 0755
-    recurse: yes
-    owner: "{{ app_user }}"
-    group: www-data
 
 # pip install stuff
 
@@ -126,6 +96,7 @@
     owner: "{{ app_user }}"
     group: www-data
   when: app_enabled
+  become: yes
   notify: restart uwsgi
 
 - name: creating {{ app_name }} socket for nginx/uwsgi
@@ -134,8 +105,10 @@
     state: touch
     owner: "{{ app_user }}"
     group: www-data
+  become: yes
 
 - name: making sure uwsgi is running
   service:
     name: uwsgi-emperor
     state: restarted
+  become: yes
