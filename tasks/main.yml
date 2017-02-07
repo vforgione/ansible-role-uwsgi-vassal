@@ -54,6 +54,8 @@
     dest: "{{ source_dir }}"
     accept_hostkey: yes
     update: yes
+  become: yes
+  become_user: www-data
   when: gh_repo is defined
 
 # setup virtualenv
