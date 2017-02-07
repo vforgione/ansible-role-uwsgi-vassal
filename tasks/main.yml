@@ -53,6 +53,7 @@
     repo: "git@github.com:{{ gh_repo }}"
     dest: "{{ source_dir }}"
     accept_hostkey: yes
+    key_file: "/home/{{ ansible_user_id }}/.ssh/id_rsa"
     update: yes
   become: yes
   become_user: www-data
