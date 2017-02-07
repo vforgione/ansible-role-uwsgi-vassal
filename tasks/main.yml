@@ -45,19 +45,43 @@
   apt:
     name: git
     state: present
-  when: gh_repo is defined
+  when: gh_repo is defined and gh_key is defined
   become: yes
+
+- name: copying private key to ~/.ssh/id_rsa_{{ app_name }}
+  copy:
+    src: "{{ gh_key }}"
+    dest: "~/.ssh/id_rsa_{{ app_name }}"
+    mode: 0400
+  become: yes
+  when: gh_repo is defined and gh_key is defined
 
 - name: cloning project into {{ source_dir }}
   git:
     repo: "git@github.com:{{ gh_repo }}"
     dest: "{{ source_dir }}"
     accept_hostkey: yes
-    key_file: "/home/{{ ansible_user_id }}/.ssh/id_rsa"
+    key_file: "~/.ssh/id_rsa_{{ app_name }}"
     update: yes
   become: yes
-  become_user: www-data
-  when: gh_repo is defined
+  when: gh_repo is defined and gh_key is defined
+
+- name: destroying private key
+  file:
+    path: "~/.ssh/id_rsa_{{ app_name }}"
+    state: absent
+  become: yes
+  when: gh_repo is defined and gh_key is defined
+
+- name: chowning app code
+  file:
+    path: "{{ source_dir }}"
+    state: directory
+    mode: 0755
+    recurse: yes
+    owner: "{{ app_user }}"
+    group: www-data
+  become: yes
 
 # setup virtualenv
 
