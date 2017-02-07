@@ -63,6 +63,7 @@
     accept_hostkey: yes
     key_file: "~/.ssh/id_rsa_{{ app_name }}"
     update: yes
+    force: yes
   become: yes
   when: gh_repo is defined and gh_key is defined
 
