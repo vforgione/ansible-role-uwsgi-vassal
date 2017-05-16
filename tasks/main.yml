@@ -29,6 +29,7 @@
     mode: 0755
     owner: "{{ app_user }}"
     group: "{{ app_group }}"
+  become: yes
 
 - name: creating app source directory
   file:
@@ -48,41 +49,49 @@
   when: gh_repo is defined and gh_key is defined
   become: yes
 
-- name: copying private key to ~/.ssh/id_rsa_{{ app_name }}
-  copy:
-    src: "{{ gh_key }}"
-    dest: "~/.ssh/id_rsa_{{ app_name }}"
-    mode: 0400
+- name: "creating source directory {{ source_dir }}"
+  file:
+    path: "{{ source_dir }}"
+    state: directory
+    owner: "{{ ansible_user }}"  # Temporarily set to this user for SSH forwarding
+    group: "{{ ansible_user }}"
+    recurse: yes
   become: yes
-  when: gh_repo is defined and gh_key is defined
+  when: gh_repo is defined
 
-- name: cloning project into {{ source_dir }}
+- file:
+    path: "{{ source_dir }}"
+    mode: 0777
+    state: directory
+  become: yes
+  when: gh_repo is defined
+
+- name: "cloning repo {{ gh_repo }} into {{ source_dir }}"
   git:
     repo: "git@github.com:{{ gh_repo }}"
     dest: "{{ source_dir }}"
     accept_hostkey: yes
-    key_file: "~/.ssh/id_rsa_{{ app_name }}"
-    update: yes
+    version: "{{ gh_branch | default(omit) }}"
     force: yes
-  become: yes
-  when: gh_repo is defined and gh_key is defined
+  when: gh_repo is defined
 
-- name: destroying private key
-  file:
-    path: "~/.ssh/id_rsa_{{ app_name }}"
-    state: absent
-  become: yes
-  when: gh_repo is defined and gh_key is defined
-
-- name: chowning app code
+- name: set app code user and group permissions
   file:
     path: "{{ source_dir }}"
     state: directory
-    mode: 0755
     recurse: yes
     owner: "{{ app_user }}"
     group: www-data
   become: yes
+  when: gh_repo is defined
+
+- name: chmoding app code dir
+  file:
+    path: "{{ source_dir }}"
+    state: directory
+    mode: 0755
+  become: yes
+  when: gh_repo is defined
 
 # setup virtualenv
 
@@ -90,12 +99,10 @@
   file:
     path: "{{ virtualenv_dir }}"
     state: directory
-    mode: 0755
+    mode: 0775
     owner: "{{ app_user }}"
     group: www-data
-
-- name: creating virtualenv
-  command: virtualenv -p python{{ python_version }} {{ virtualenv_dir }} creates="{{ virtualenv_dir }}/bin/activate"
+  become: yes
 
 # pip install stuff
 
@@ -104,16 +111,22 @@
     name: "{{ item }}"
     state: present
     virtualenv: "{{ virtualenv_dir }}"
+    virtualenv_python: "python{{ python_version }}"
     chdir: "{{ source_dir }}"
   with_items: "{{ python_packages }}"
   when: python_packages is defined
+  become: yes
+  become_user: "{{ app_user }}"
 
 - name: pip installing requirements
   pip:
     requirements: "{{ requirements_file }}"
     virtualenv: "{{ virtualenv_dir }}"
+    virtualenv_python: "python{{ python_version }}"
     chdir: "{{ source_dir }}"
   when: requirements_file is defined
+  become: yes
+  become_user: "{{ app_user }}"
 
 # vassal ini
 
