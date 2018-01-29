@@ -9,6 +9,7 @@
 {% if 'pythonpath' not in uwsgi.keys() %}pythonpath = {{ source_dir }}{% endif %}
 {% if 'chdir' not in uwsgi.keys() %}chdir = {{ source_dir }}{% endif %}
 {% if 'home' not in uwsgi.keys() %}home = {{ virtualenv_dir }}{% endif %}
+threads = 5
 
 ; user settings
 {% if app_user != 'www-data' %}username = {{ app_user }}{% endif %}
