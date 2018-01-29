@@ -33,8 +33,8 @@ It also makes sense to have uWSGI installed and running in emperor mode.
 | `app_enabled`       | no                     | should a vassal ini file be added to the emperor     |
 | `env_vars`          | []                     | environment vars to be written to the vassal ini     |
 | `uwsgi`             | {}                     | additional key/value pairs to be added to vassal ini |
-| `gh_repo`           | undefined              | a GitHub path to a repo; a la `username/repo.git`    |
-| `gh_key`            | undefined              | path the the private key to clone repos from GitHub  |
+| `repo`              | undefined              | a full ssh path to clone a repo                      |
+| `branch`            | undefined              | the branch of the repo to clone                      |
 
 
 ## Example Playbooks

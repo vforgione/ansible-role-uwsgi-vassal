@@ -46,7 +46,7 @@
   apt:
     name: git
     state: present
-  when: gh_repo is defined and gh_key is defined
+  when: repo is defined
   become: yes
 
 - name: "creating source directory {{ source_dir }}"
@@ -57,23 +57,23 @@
     group: "{{ ansible_user }}"
     recurse: yes
   become: yes
-  when: gh_repo is defined
+  when: repo is defined
 
 - file:
     path: "{{ source_dir }}"
     mode: 0777
     state: directory
   become: yes
-  when: gh_repo is defined
+  when: repo is defined
 
-- name: "cloning repo {{ gh_repo }} into {{ source_dir }}"
+- name: "cloning repo {{ repo }} into {{ source_dir }}"
   git:
-    repo: "git@github.com:{{ gh_repo }}"
+    repo: "{{ repo }}"
     dest: "{{ source_dir }}"
     accept_hostkey: yes
-    version: "{{ gh_branch | default(omit) }}"
+    version: "{{ branch | default(omit) }}"
     force: yes
-  when: gh_repo is defined
+  when: repo is defined
 
 - name: set app code user and group permissions
   file:
@@ -83,7 +83,7 @@
     owner: "{{ app_user }}"
     group: www-data
   become: yes
-  when: gh_repo is defined
+  when: repo is defined
 
 - name: chmoding app code dir
   file:
@@ -91,7 +91,7 @@
     state: directory
     mode: 0755
   become: yes
-  when: gh_repo is defined
+  when: repo is defined
 
 # setup virtualenv
 
