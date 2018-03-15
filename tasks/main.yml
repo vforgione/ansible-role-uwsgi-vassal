@@ -71,7 +71,7 @@
     repo: "{{ repo }}"
     dest: "{{ source_dir }}"
     accept_hostkey: yes
-    version: "{{ branch | default(omit) }}"
+    version: "{{ branch | default('master') }}"
     force: yes
   when: repo is defined
 
