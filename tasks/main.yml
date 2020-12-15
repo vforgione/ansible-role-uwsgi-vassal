@@ -2,13 +2,14 @@
 
 # system packages
 
-- name: installing system packages
+- name: apt installing uwsgi build requirements
   apt:
-    name: "{{ item }}"
-    state: present
-  with_items: "{{ system_packages }}"
-  when: system_packages is defined
+    pkg:
+      - build-essential
+      - gcc
   become: yes
+  tags:
+    - uwsgi-emperor
 
 # app user
 
