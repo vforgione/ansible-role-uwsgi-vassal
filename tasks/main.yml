@@ -4,9 +4,8 @@
 
 - name: apt installing uwsgi build requirements
   apt:
-    pkg:
-      - build-essential
-      - gcc
+    pkg: "{{ system_packages }}"
+  when: system_packages is defined
   become: yes
   tags:
     - uwsgi-emperor
@@ -144,6 +143,14 @@
 - name: creating {{ app_name }} socket for nginx/uwsgi
   file:
     path: "/tmp/{{ app_name }}.sock"
+    state: touch
+    owner: "{{ app_user }}"
+    group: www-data
+  become: yes
+
+- name: creating vassal log file for {{ app_name }}
+  file:
+    path: "/var/log/{{ app_name }}.log"
     state: touch
     owner: "{{ app_user }}"
     group: www-data

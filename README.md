@@ -142,6 +142,7 @@ pythonpath = /www/metalsnake/metalsnake
 chdir = /www/metalsnake/metalsnake
 env = DJANGO_SETTINGS_MODULE=metalsnake.settings.vagrant
 env = PATH=/usr/local/bin:/usr/bin:/bin:/usr/local/games:/usr/games
+logto = /var/log/uwsgi/metalsnake.log
 ```
 
 

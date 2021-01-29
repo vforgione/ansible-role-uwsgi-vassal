@@ -20,6 +20,6 @@ env_vars: []
 
 uwsgi: {}
 
-system_packages: ["acl"]
+system_packages: ["acl", "build-essential", "gcc"]
 
 python_packages: []
