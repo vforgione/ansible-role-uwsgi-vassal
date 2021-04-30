@@ -16,6 +16,6 @@ threads = 5
 {% if app_user != 'www-data' %}username = {{ app_user }}{% endif %}
 
 ; env vars
-{% for var in env_vars %}
-env = {{ var }}
+{% for key in env_vars %}
+env = {{ key }}={{ env_vars[key] }}
 {% endfor %}
